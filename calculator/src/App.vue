@@ -1,16 +1,19 @@
 <template>
-  <CounterApp />
+  <!-- <CounterApp /> -->
+  <CalculatorApp />
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
 // import HelloWorld from "./components/HelloWorld.vue";
-import CounterApp from "./components/HelloWorld.vue";
+// import CounterApp from "./components/HelloWorld.vue";
+import CalculatorApp from "./components/Calculator.vue";
 
 export default defineComponent({
   name: "App",
   components: {
-    CounterApp,
+    // CounterApp,
+    CalculatorApp,
   },
 });
 </script>

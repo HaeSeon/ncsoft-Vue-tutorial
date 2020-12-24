@@ -3,6 +3,7 @@
     <h1>{{ msg }}</h1>
   </div> -->
   <div id="counter">Counter: {{ counter }}</div>
+  <button v-on:click="counterRestart">restart</button>
 </template>
 
 <script lang="ts">
@@ -30,6 +31,12 @@ export default defineComponent({
     return {
       counter: 0,
     };
+  },
+  methods: {
+    counterRestart() {
+      console.log("stop");
+      this.counter = 0;
+    },
   },
   mounted() {
     console.log("helllll");

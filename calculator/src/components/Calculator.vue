@@ -2,31 +2,31 @@
   <h1>쌀집 계산기</h1>
 
   <div class="grid-container">
-    <div class="result-viewer">Result</div>
+    <div class="result-viewer">{{ view }}</div>
     <div v-on:click="excuteMC">MC</div>
     <div v-on:click="excuteMR">MR</div>
-    <div>M-</div>
-    <div>M+</div>
-    <div>÷</div>
-    <div>+/-</div>
-    <div>7</div>
-    <div>8</div>
-    <div>9</div>
-    <div>X</div>
+    <div v-on:click="excuteMminus">M-</div>
+    <div v-on:click="excuteMplus">M+</div>
+    <div v-on:click="pressOp('/')">÷</div>
+    <div v-on:click="pressNegate">+/-</div>
+    <div v-on:click="pressNum(7)">7</div>
+    <div v-on:click="pressNum(8)">8</div>
+    <div v-on:click="pressNum(9)">9</div>
+    <div v-on:click="pressOp('*')">X</div>
     <div>C</div>
-    <div>4</div>
-    <div>5</div>
-    <div>6</div>
-    <div>-</div>
+    <div v-on:click="pressNum(4)">4</div>
+    <div v-on:click="pressNum(5)">5</div>
+    <div v-on:click="pressNum(6)">6</div>
+    <div v-on:click="pressOp('-')">-</div>
     <div>AC</div>
-    <div>1</div>
-    <div>2</div>
-    <div>3</div>
-    <div class="plus">+</div>
-    <div>0</div>
+    <div v-on:click="pressNum(1)">1</div>
+    <div v-on:click="pressNum(2)">2</div>
+    <div v-on:click="pressNum(3)">3</div>
+    <div class="plus" v-on:click="pressOp('+')">+</div>
+    <div v-on:click="pressNum(0)">0</div>
     <div>00</div>
     <div>.</div>
-    <div>=</div>
+    <div v-on:click="pressEnter">=</div>
   </div>
 
   <!-- <button v-on:click="Enter">Enter</button> -->
@@ -35,16 +35,32 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 
-interface Result {
-  result: number;
+function calcWithOp(num2: number, num1: number, op: string): number {
+  if (!op) {
+    return num1;
+  }
+  switch (op) {
+    case "+":
+      return num2 + num1;
+    case "-":
+      return num2 - num1;
+    case "*":
+      return num2 * num1;
+    case "/":
+      return num2 / num1;
+    default:
+      throw `invalid operator`;
+  }
 }
 
 export default defineComponent({
   name: "CalculatorApp",
-
   data() {
     return {
-      result: 50,
+      num1: 0,
+      num2: 0,
+      op: "",
+      view: 0,
     };
   },
   methods: {
@@ -54,9 +70,39 @@ export default defineComponent({
     excuteMR() {
       console.log("MR");
     },
-  },
-  mounted() {
-    console.log("helllll");
+    pressNum(num: string) {
+      this.num1 = Number(String(this.num1) + num);
+      console.log("op : ", this.op, "num1 : ", this.num1, "num2 : ", this.num2);
+      this.view = this.num1;
+    },
+    pressOp(op: string) {
+      if (this.num2 == 0) {
+        this.num2 = this.num1;
+      } else {
+        this.num2 = calcWithOp(this.num2, this.num1, this.op);
+      }
+      this.op = op;
+      this.view = this.num2;
+      this.num1 = 0;
+      console.log("op : ", this.op, "num1 : ", this.num1, "num2 : ", this.num2);
+    },
+    pressEnter() {
+      this.num1 = calcWithOp(this.num2, this.num1, this.op);
+      console.log(
+        "after calc, num1 : ",
+        this.num1,
+        "op : ",
+        this.op,
+        "num2 : ",
+        this.num2
+      );
+      this.view = this.num1;
+      this.num2 = 0;
+    },
+    pressNegate() {
+      this.num1 = -this.num1;
+      this.view = this.num1;
+    },
   },
 });
 </script>

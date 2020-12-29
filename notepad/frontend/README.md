@@ -1,4 +1,4 @@
-# notepad
+# frontend
 
 ## Project setup
 ```

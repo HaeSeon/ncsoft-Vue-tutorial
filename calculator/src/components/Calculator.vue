@@ -13,19 +13,19 @@
     <div v-on:click="pressNum('8')">8</div>
     <div v-on:click="pressNum('9')">9</div>
     <div v-on:click="pressOp('*')">X</div>
-    <div>C</div>
+    <div v-on:click="pressAC()">C</div>
     <div v-on:click="pressNum('4')">4</div>
     <div v-on:click="pressNum('5')">5</div>
     <div v-on:click="pressNum('6')">6</div>
     <div v-on:click="pressOp('-')">-</div>
-    <div>AC</div>
+    <div v-on:click="pressAC()">AC</div>
     <div v-on:click="pressNum('1')">1</div>
     <div v-on:click="pressNum('2')">2</div>
     <div v-on:click="pressNum('3')">3</div>
     <div class="plus" v-on:click="pressOp('+')">+</div>
     <div v-on:click="pressNum('0')">0</div>
     <div v-on:click="pressNum('00')">00</div>
-    <div>.</div>
+    <div v-on:click="pressNum('.')">.</div>
     <div v-on:click="pressEnter">=</div>
   </div>
 
@@ -57,8 +57,8 @@ export default defineComponent({
   name: "CalculatorApp",
   data() {
     return {
-      inputNum: "",
-      resultNum: "",
+      inputNum: "0",
+      resultNum: "0",
       fromEnter: false,
       op: "",
       view: "0",
@@ -76,11 +76,23 @@ export default defineComponent({
       if (this.fromEnter == true) {
         // 1+1=2 하고 AC버튼 없이 숫자를 눌렀을 경우
         this.resultNum = "";
-        this.resultNum = String(this.resultNum) + num;
+        if (num == "." && this.resultNum.includes(".")) {
+          console.log("dot duplicated");
+        } else if (num != "." && this.resultNum == "0") {
+          this.resultNum = `${num}`;
+        } else {
+          this.resultNum = `${this.resultNum}${num}`;
+        }
         this.view = this.resultNum;
         this.fromEnter = false;
       } else {
-        this.inputNum = String(this.inputNum) + num;
+        if (num == "." && this.inputNum.includes(".")) {
+          console.log("dot duplicated");
+        } else if (num != "." && this.inputNum == "0") {
+          this.inputNum = `${num}`;
+        } else {
+          this.inputNum = `${this.inputNum}${num}`;
+        }
         console.log(
           "op : ",
           this.op,
@@ -171,6 +183,12 @@ export default defineComponent({
         "resultNum : ",
         this.resultNum
       );
+    },
+    pressAC() {
+      this.resultNum = "";
+      this.inputNum = "";
+      this.view = "0";
+      this.op = "";
     },
   },
 });

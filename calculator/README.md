@@ -1,24 +1,8 @@
 # calculator
 
-## Project setup
-```
-npm install
-```
+***todo***
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
+* 메모리 기능
+* 소수점
+* C/AC 
 
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).

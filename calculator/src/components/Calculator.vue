@@ -57,8 +57,8 @@ export default defineComponent({
   name: "CalculatorApp",
   data() {
     return {
-      num1: "",
-      num2: "",
+      inputNum: "",
+      resultNum: "",
       fromEnter: false,
       op: "",
       view: "0",
@@ -73,64 +73,104 @@ export default defineComponent({
       console.log("MR");
     },
     pressNum(num: string) {
-      this.num1 = String(this.num1) + num;
-      console.log("op : ", this.op, "num1 : ", this.num1, "num2 : ", this.num2);
-      this.view = this.num1;
-    },
-    pressOp(op: string) {
-      if (this.num2 == "") {
-        // 이전 결과값이 없으면
-        this.num2 = this.num1;
-      } else if (this.fromEnter == true) {
-        // 이전값이 넘어온 경로가 pressEnter이면
-        console.log("pass");
+      if (this.fromEnter == true) {
+        // 1+1=2 하고 AC버튼 없이 숫자를 눌렀을 경우
+        this.resultNum = "";
+        this.resultNum = String(this.resultNum) + num;
+        this.view = this.resultNum;
+        this.fromEnter = false;
       } else {
-        // 이전값이 넘어온 경로가 pressOp이면
-        this.num2 = String(
-          calcWithOp(Number(this.num2), Number(this.num1), this.op)
-        );
+        this.inputNum = String(this.inputNum) + num;
         console.log(
-          "In operation calc calc, num1 : ",
-          this.num1,
           "op : ",
           this.op,
-          "num2 : ",
-          this.num2
+          "inputNum : ",
+          this.inputNum,
+          "resultNum : ",
+          this.resultNum
+        );
+        this.view = this.inputNum;
+      }
+    },
+    pressOp(op: string) {
+      if (this.inputNum != "") {
+        //operation만 여러번 눌렀을 때 대비
+        if (this.resultNum == "") {
+          // 이전 결과값이 없으면
+          this.resultNum = this.inputNum;
+        } else if (this.fromEnter == true) {
+          // 이전값이 넘어온 경로가 pressEnter이면
+          console.log("pass");
+        } else {
+          // 이전값이 넘어온 경로가 pressOp이면
+          this.resultNum = String(
+            calcWithOp(Number(this.resultNum), Number(this.inputNum), this.op)
+          );
+        }
+        this.view = this.resultNum;
+        this.inputNum = "";
+        console.log(
+          "op : ",
+          this.op,
+          "inputNum : ",
+          this.inputNum,
+          "resultNum : ",
+          this.resultNum
         );
       }
       this.op = op;
-      this.view = this.num2;
-      this.num1 = "";
       this.fromEnter = false;
-      console.log("op : ", this.op, "num1 : ", this.num1, "num2 : ", this.num2);
     },
     pressEnter() {
+      if (this.inputNum == "") {
+        // 3+ = = = 처리
+        this.inputNum = this.resultNum;
+      }
       console.log(
-        "before calc, num1 : ",
-        this.num1,
+        "before calc, inputNum : ",
+        this.inputNum,
         "op : ",
         this.op,
-        "num2 : ",
-        this.num2
+        "resultNum : ",
+        this.resultNum
       );
-      this.num2 = String(
-        calcWithOp(Number(this.num2), Number(this.num1), this.op)
+      this.resultNum = String(
+        calcWithOp(Number(this.resultNum), Number(this.inputNum), this.op)
       );
-      this.num1 = "";
       this.fromEnter = true;
       console.log(
-        "after calc, num1 : ",
-        this.num1,
+        "after calc, inputNum : ",
+        this.inputNum,
         "op : ",
         this.op,
-        "num2 : ",
-        this.num2
+        "resultNum : ",
+        this.resultNum
       );
-      this.view = this.num2;
+      this.view = this.resultNum;
     },
     pressNegate() {
-      this.num1 = String(-Number(this.num1));
-      this.view = this.num1;
+      if (this.fromEnter == true) {
+        // 3+3=6 에서 negate(6) 을 처리할 경우
+        this.resultNum = String(-Number(this.resultNum));
+        this.view = this.resultNum;
+      } else {
+        if (this.inputNum != "") {
+          //negate(3)=-3
+          this.inputNum = String(-Number(this.inputNum));
+        } else {
+          // 5 + negate() -> 5+negate(5)=0
+          this.inputNum = String(-Number(this.resultNum));
+        }
+        this.view = this.inputNum;
+      }
+      console.log(
+        "op : ",
+        this.op,
+        "inputNum : ",
+        this.inputNum,
+        "resultNum : ",
+        this.resultNum
+      );
     },
   },
 });

@@ -9,22 +9,22 @@
     <div v-on:click="excuteMplus">M+</div>
     <div v-on:click="pressOp('/')">÷</div>
     <div v-on:click="pressNegate">+/-</div>
-    <div v-on:click="pressNum(7)">7</div>
-    <div v-on:click="pressNum(8)">8</div>
-    <div v-on:click="pressNum(9)">9</div>
+    <div v-on:click="pressNum('7')">7</div>
+    <div v-on:click="pressNum('8')">8</div>
+    <div v-on:click="pressNum('9')">9</div>
     <div v-on:click="pressOp('*')">X</div>
     <div>C</div>
-    <div v-on:click="pressNum(4)">4</div>
-    <div v-on:click="pressNum(5)">5</div>
-    <div v-on:click="pressNum(6)">6</div>
+    <div v-on:click="pressNum('4')">4</div>
+    <div v-on:click="pressNum('5')">5</div>
+    <div v-on:click="pressNum('6')">6</div>
     <div v-on:click="pressOp('-')">-</div>
     <div>AC</div>
-    <div v-on:click="pressNum(1)">1</div>
-    <div v-on:click="pressNum(2)">2</div>
-    <div v-on:click="pressNum(3)">3</div>
+    <div v-on:click="pressNum('1')">1</div>
+    <div v-on:click="pressNum('2')">2</div>
+    <div v-on:click="pressNum('3')">3</div>
     <div class="plus" v-on:click="pressOp('+')">+</div>
-    <div v-on:click="pressNum(0)">0</div>
-    <div>00</div>
+    <div v-on:click="pressNum('0')">0</div>
+    <div v-on:click="pressNum('00')">00</div>
     <div>.</div>
     <div v-on:click="pressEnter">=</div>
   </div>
@@ -57,10 +57,11 @@ export default defineComponent({
   name: "CalculatorApp",
   data() {
     return {
-      num1: 0,
-      num2: 0,
+      num1: "",
+      num2: "",
       op: "",
-      view: 0,
+      view: "0",
+      memory: "",
     };
   },
   methods: {
@@ -71,23 +72,48 @@ export default defineComponent({
       console.log("MR");
     },
     pressNum(num: string) {
-      this.num1 = Number(String(this.num1) + num);
+      this.num1 = String(this.num1) + num;
       console.log("op : ", this.op, "num1 : ", this.num1, "num2 : ", this.num2);
       this.view = this.num1;
     },
     pressOp(op: string) {
-      if (this.num2 == 0) {
+      if (this.num1 == "" && this.num2 != "") {
+        // 이전값이 넘어온 경로가 pressOp이면
         this.num2 = this.num1;
+      } else if (this.num1 == "T") {
+        // 이전값이 넘어온 경로가 pressEnter이면
+        console.log("pass");
       } else {
-        this.num2 = calcWithOp(this.num2, this.num1, this.op);
+        this.num2 = String(
+          calcWithOp(Number(this.num2), Number(this.num1), this.op)
+        );
+        console.log(
+          "In operation calc calc, num1 : ",
+          this.num1,
+          "op : ",
+          this.op,
+          "num2 : ",
+          this.num2
+        );
       }
       this.op = op;
       this.view = this.num2;
-      this.num1 = 0;
+      this.num1 = "";
       console.log("op : ", this.op, "num1 : ", this.num1, "num2 : ", this.num2);
     },
     pressEnter() {
-      this.num1 = calcWithOp(this.num2, this.num1, this.op);
+      console.log(
+        "before calc, num1 : ",
+        this.num1,
+        "op : ",
+        this.op,
+        "num2 : ",
+        this.num2
+      );
+      this.num2 = String(
+        calcWithOp(Number(this.num2), Number(this.num1), this.op)
+      );
+      this.num1 = "T";
       console.log(
         "after calc, num1 : ",
         this.num1,
@@ -96,11 +122,10 @@ export default defineComponent({
         "num2 : ",
         this.num2
       );
-      this.view = this.num1;
-      this.num2 = 0;
+      this.view = this.num2;
     },
     pressNegate() {
-      this.num1 = -this.num1;
+      this.num1 = String(-Number(this.num1));
       this.view = this.num1;
     },
   },

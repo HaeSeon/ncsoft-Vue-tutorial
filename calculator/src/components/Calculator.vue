@@ -59,6 +59,7 @@ export default defineComponent({
     return {
       num1: "",
       num2: "",
+      fromEnter: false,
       op: "",
       view: "0",
       memory: "",
@@ -77,13 +78,14 @@ export default defineComponent({
       this.view = this.num1;
     },
     pressOp(op: string) {
-      if (this.num1 == "" && this.num2 != "") {
-        // 이전값이 넘어온 경로가 pressOp이면
+      if (this.num2 == "") {
+        // 이전 결과값이 없으면
         this.num2 = this.num1;
-      } else if (this.num1 == "T") {
+      } else if (this.fromEnter == true) {
         // 이전값이 넘어온 경로가 pressEnter이면
         console.log("pass");
       } else {
+        // 이전값이 넘어온 경로가 pressOp이면
         this.num2 = String(
           calcWithOp(Number(this.num2), Number(this.num1), this.op)
         );
@@ -99,6 +101,7 @@ export default defineComponent({
       this.op = op;
       this.view = this.num2;
       this.num1 = "";
+      this.fromEnter = false;
       console.log("op : ", this.op, "num1 : ", this.num1, "num2 : ", this.num2);
     },
     pressEnter() {
@@ -113,7 +116,8 @@ export default defineComponent({
       this.num2 = String(
         calcWithOp(Number(this.num2), Number(this.num1), this.op)
       );
-      this.num1 = "T";
+      this.num1 = "";
+      this.fromEnter = true;
       console.log(
         "after calc, num1 : ",
         this.num1,

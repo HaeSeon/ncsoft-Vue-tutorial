@@ -1,34 +1,35 @@
 <template>
-  <h1>쌀집 계산기</h1>
+  <div>
+    <h1>쌀집 계산기</h1>
 
-  <div class="grid-container">
-    <div class="result-viewer">{{ view }}</div>
-    <div v-on:click="excuteMC">MC</div>
-    <div v-on:click="excuteMR">MR</div>
-    <div v-on:click="excuteMminus">M-</div>
-    <div v-on:click="excuteMplus">M+</div>
-    <div v-on:click="pressOp('/')">÷</div>
-    <div v-on:click="pressNegate">+/-</div>
-    <div v-on:click="pressNum('7')">7</div>
-    <div v-on:click="pressNum('8')">8</div>
-    <div v-on:click="pressNum('9')">9</div>
-    <div v-on:click="pressOp('*')">X</div>
-    <div v-on:click="pressAC()">C</div>
-    <div v-on:click="pressNum('4')">4</div>
-    <div v-on:click="pressNum('5')">5</div>
-    <div v-on:click="pressNum('6')">6</div>
-    <div v-on:click="pressOp('-')">-</div>
-    <div v-on:click="pressAC()">AC</div>
-    <div v-on:click="pressNum('1')">1</div>
-    <div v-on:click="pressNum('2')">2</div>
-    <div v-on:click="pressNum('3')">3</div>
-    <div class="plus" v-on:click="pressOp('+')">+</div>
-    <div v-on:click="pressNum('0')">0</div>
-    <div v-on:click="pressNum('00')">00</div>
-    <div v-on:click="pressNum('.')">.</div>
-    <div v-on:click="pressEnter">=</div>
+    <div class="grid-container">
+      <div class="result-viewer">{{ view }}</div>
+      <div v-on:click="excuteMC">MC</div>
+      <div v-on:click="excuteMR">MR</div>
+      <div v-on:click="excuteMminus">M-</div>
+      <div v-on:click="excuteMplus">M+</div>
+      <div v-on:click="pressOp('/')">÷</div>
+      <div v-on:click="pressNegate">+/-</div>
+      <div v-on:click="pressNum('7')">7</div>
+      <div v-on:click="pressNum('8')">8</div>
+      <div v-on:click="pressNum('9')">9</div>
+      <div v-on:click="pressOp('*')">X</div>
+      <div v-on:click="pressAC()">C</div>
+      <div v-on:click="pressNum('4')">4</div>
+      <div v-on:click="pressNum('5')">5</div>
+      <div v-on:click="pressNum('6')">6</div>
+      <div v-on:click="pressOp('-')">-</div>
+      <div v-on:click="pressAC()">AC</div>
+      <div v-on:click="pressNum('1')">1</div>
+      <div v-on:click="pressNum('2')">2</div>
+      <div v-on:click="pressNum('3')">3</div>
+      <div class="plus" v-on:click="pressOp('+')">+</div>
+      <div v-on:click="pressNum('0')">0</div>
+      <div v-on:click="pressNum('00')">00</div>
+      <div v-on:click="pressNum('.')">.</div>
+      <div v-on:click="pressEnter">=</div>
+    </div>
   </div>
-
   <!-- <button v-on:click="Enter">Enter</button> -->
 </template>
 
@@ -121,14 +122,6 @@ export default defineComponent({
         }
         this.view = this.resultNum;
         this.inputNum = "";
-        console.log(
-          "op : ",
-          this.op,
-          "inputNum : ",
-          this.inputNum,
-          "resultNum : ",
-          this.resultNum
-        );
       }
       this.op = op;
       this.fromEnter = false;
@@ -138,26 +131,10 @@ export default defineComponent({
         // 3+ = = = 처리
         this.inputNum = this.resultNum;
       }
-      console.log(
-        "before calc, inputNum : ",
-        this.inputNum,
-        "op : ",
-        this.op,
-        "resultNum : ",
-        this.resultNum
-      );
       this.resultNum = String(
         calcWithOp(Number(this.resultNum), Number(this.inputNum), this.op)
       );
       this.fromEnter = true;
-      console.log(
-        "after calc, inputNum : ",
-        this.inputNum,
-        "op : ",
-        this.op,
-        "resultNum : ",
-        this.resultNum
-      );
       this.view = this.resultNum;
     },
     pressNegate() {

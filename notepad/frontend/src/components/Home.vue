@@ -1,5 +1,5 @@
 <template>
-  <h1>메인 페이지입니다.</h1>
+  <h1>메인 Home 페이지입니다.</h1>
 </template>
 
 <script lang="ts">

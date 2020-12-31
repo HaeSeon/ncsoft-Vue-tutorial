@@ -1,14 +1,17 @@
 <template>
-  <h1>안녕하세요</h1>
-  <router-view />
+  <h1>안녕하세요. 최상위 components인 App.vue 입니다.</h1>
+  <!-- <router-view /> -->
+  <Home />
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
+import Home from "./components/Home.vue";
+
 export default defineComponent({
   name: "App",
-  mounted() {
-    console.log(`hi`);
+  components: {
+    Home,
   },
 });
 </script>

@@ -3,6 +3,10 @@ import express from 'express'
 const app = express();
 const port = 3001;
 
+// cors setting
+import cors from "cors"
+app.use(cors());
+
 // mongoose module
 import mongoose from 'mongoose'
 mongoose.connect("mongodb://localhost:27017/notepad_db")	//db명

@@ -1,28 +1,38 @@
 <template>
-  <h1>안녕하세요. 최상위 components인 App.vue 입니다.</h1>
-  <!-- <router-view /> -->
-  <Home />
+  <div id="app">
+    <div id="nav">
+      <h1>HaeSunnySideOf's notepad</h1>
+      <router-link to="/home">Home</router-link> |
+      <router-link to="/login">Login</router-link>
+    </div>
+    <router-view />
+  </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import Home from "./components/Home.vue";
 
 export default defineComponent({
   name: "App",
-  components: {
-    Home,
-  },
 });
 </script>
 
-<style>
+<style lang="scss">
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+  font-family: "Avenir", Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
+}
+#nav {
+  padding: 30px;
+  a {
+    font-weight: bold;
+    color: #2c3e50;
+    &.router-link-exact-active {
+      color: pink;
+    }
+  }
 }
 </style>

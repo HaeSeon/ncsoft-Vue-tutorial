@@ -9,6 +9,8 @@
   },
   "dependencies": {
     "@types/vue-router": "^2.0.0",
+    "sass": "^1.32.0",
+    "sass-loader": "^10.1.0",
     "vue": "^3.0.0",
     "vue-router": "^4.0.2"
   },

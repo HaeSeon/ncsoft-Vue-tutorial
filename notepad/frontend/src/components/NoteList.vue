@@ -2,41 +2,61 @@
   <div class="notes-container">
     <ul class="note-list">
       <div v-for="note in notes" v-bind:key="note.id">
-        {{ note.createDatetime }}<br /><br />
-        {{ note.content }}
+        <NoteItem v-bind="note" />
       </div>
     </ul>
+    <button v-on:click="addPost">새로운 노트 작성</button>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-export const serverUrl = `http://${location.hostname}:3001`;
+import { serverUrl } from "@/main";
+import { getToken } from "@/module";
+import { defineComponent, PropType, reactive } from "vue";
+import NoteItemVue from "./NoteItem.vue";
+
+interface Post {
+  ownerId: string;
+  content: string;
+  createDatetime: number;
+}
 
 export default defineComponent({
   name: "NoteList",
+  components: {
+    NoteItem: NoteItemVue,
+  },
+  props: {
+    onSelect: Function,
+  },
   data() {
     return {
-      notes: [{ ownerId: String, content: String, createDatetime: Number }],
+      notes: [] as Post[],
     };
   },
-
   methods: {
-    readPosts() {
+    readPosts: async function () {
       const url = `${serverUrl}/notes`;
-      fetch(url)
-        .then((res) => res.json())
-        .then((res) => {
-          const posts = res.posts as any[];
-          this.notes = posts.map((post) => {
-            return {
-              ownerId: post.owner_id,
-              createDatetime: post.create_datetime,
-              content: post.content,
-            };
-          });
-          console.log(this.notes);
-        });
+      const response = await fetch(url, {
+        headers: {
+          token: getToken(),
+        },
+      });
+      const res = (await response.json()) as any;
+      const posts = res.posts as any[];
+
+      this.notes = posts.map((post) => {
+        return {
+          ownerId: post.owner_id,
+          createDatetime: post.create_datetime,
+          content: post.content,
+          _id: post._id,
+        };
+      });
+    },
+
+    addPost() {
+      location.search = "";
     },
   },
   mounted() {
@@ -46,7 +66,6 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-$blue: rgb(199, 232, 245);
 $yellow: rgb(252, 245, 230);
 $primaryLight: #fdf2f0;
 $primaryColor: #f8dae2;
@@ -63,13 +82,18 @@ $primaryDark: #b57fb3;
   display: flex;
   padding: 0;
   margin: 0;
-  div {
-    background: $blue;
-    padding: 10px;
-    margin: 10px;
-    width: 100px;
-    height: 100px;
-  }
+
+  overflow-x: scroll;
+}
+button {
+  padding: 10px;
+  cursor: pointer;
+  border: 1px solid white;
+
+  background-color: $primaryColor;
+}
+.note-list::-webkit-scrollbar {
+  display: none;
 }
 </style>
  

@@ -1,37 +1,69 @@
 <template>
   <div class="note-container">
     <h1>{{ date }}</h1>
-    <textarea v-model="post.content" rows="13" />
-    <button v-on:click="createNote">작성 완료</button>
+    <textarea v-model="post.content" rows="13" /><br />
+    <button v-on:click="submitNote">작성 완료</button>
   </div>
 </template>
 
 <script lang="ts">
+import { serverUrl } from "@/main";
+import { getUserId } from "@/module";
 import { defineComponent } from "vue";
-export const serverUrl = `http://${location.hostname}:3001`;
 
 export default defineComponent({
   name: "Note",
   data() {
     return {
-      post: { ownerId: String, content: String },
+      post: { ownerId: "", content: "" },
     };
   },
+  async mounted() {
+    const noteId = new URLSearchParams(location.search).get("note_id");
+    if (!noteId) {
+      return;
+    }
+    const url = `${serverUrl}/notes/${noteId}`;
+    const response = await fetch(url);
+    const post = await response.json();
+    console.log(post);
+    this.post = post;
+  },
   methods: {
-    async createNote() {
+    async submitNote() {
+      const userId = await getUserId();
       const timestamp = new Date().getTime();
+      const noteId = new URLSearchParams(location.search).get("note_id");
       const request = {
-        // 카멜케이스....
-        ownerId: "5fed5d8dde9a450bf092be9e",
+        ownerId: userId,
         content: this.post.content,
-        createDatetime: timestamp,
       };
-      const url = `${serverUrl}/notes`;
-      await fetch(url, {
-        method: "post",
-        body: JSON.stringify(request),
-        headers: { "Content-Type": "application/json" },
-      });
+      console.log(noteId);
+      let result;
+      if (!noteId) {
+        const url = `${serverUrl}/notes`;
+        const response = await fetch(url, {
+          method: "post",
+          body: JSON.stringify(request),
+          headers: { "Content-Type": "application/json" },
+        });
+        result = await response.json();
+      } else {
+        const url = `${serverUrl}/notes/${noteId}`;
+        const response = await fetch(url, {
+          method: "put",
+          body: JSON.stringify(request),
+          headers: { "Content-Type": "application/json" },
+        });
+        result = await response.json();
+      }
+      console.log(result.ok);
+      if (result.ok == true) {
+        // alert("저장 완료");
+        location.reload();
+      } else {
+        alert("노트 저장 실패");
+      }
     },
   },
 });

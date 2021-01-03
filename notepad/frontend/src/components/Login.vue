@@ -10,13 +10,13 @@
     /><br />
     <p>{{ message }}</p>
     <button class="button" v-on:click="login">Login</button><br />
-    <router-link to="/auth/signup">SignUp</router-link>
+    <router-link to="/signup">SignUp</router-link>
   </div>
 </template>
 
 <script lang="ts">
+import { serverUrl } from "@/main";
 import { defineComponent } from "vue";
-export const serverUrl = `http://${location.hostname}:3001`;
 
 export default defineComponent({
   name: "Login",
@@ -42,9 +42,10 @@ export default defineComponent({
       console.log(result.ok);
       if (result.ok == true) {
         console.log(result.token);
+        document.cookie = "";
         document.cookie = `token=${result.token}`;
 
-        this.$router.replace("../home");
+        this.$router.replace("/home");
       } else {
         this.message = "로그인 실패";
       }
@@ -61,6 +62,7 @@ $primaryColor: #f8dae2;
 $primaryDark: #b57fb3;
 
 .login {
+  margin: 5%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -75,6 +77,10 @@ $primaryDark: #b57fb3;
   height: 40px;
   background-color: $primaryLight;
   border: 1px solid white;
+}
+
+h2 {
+  margin: 10%;
 }
 
 .button {

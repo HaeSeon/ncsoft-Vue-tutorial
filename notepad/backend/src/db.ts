@@ -1,6 +1,6 @@
 // mongoose module
 import mongoose, { Document, Mongoose } from 'mongoose'
-mongoose.connect("mongodb://localhost:27017/notepad_db")	//db명
+mongoose.connect("mongodb://localhost:27017/notepad_db", { useNewUrlParser: true, useUnifiedTopology: true })	//db명
 const db = mongoose.connection
 
 // mongoose connection

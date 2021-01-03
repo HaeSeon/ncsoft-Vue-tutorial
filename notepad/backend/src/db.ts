@@ -26,15 +26,17 @@ export const User = mongoose.model<UserModel>("User", UserSchema);
 
 interface PostModel extends Document {
   // todo : implement here
+  owner_id: string,
+  content: string,
+  create_datetime: number
 }
 // generate Post data
 const PostSchema = new mongoose.Schema<PostModel>({
   owner_id: String,
   content: String,
   create_datetime: Number,
-  important: Boolean
 });
-export const Post = mongoose.model("Post", PostSchema)
+export const Post = mongoose.model<PostModel>("Post", PostSchema)
 
 // let today = new Date();
 // const note = new Post({

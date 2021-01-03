@@ -1,10 +1,12 @@
 <template>
   <div id="app">
-    <div id="nav">
+    <!-- <div id="nav">
       <h1>HaeSunnySideOf's notepad</h1>
+      <br />
+      <br />
       <router-link to="/home">Home</router-link> |
-      <router-link to="/login">Login</router-link>
-    </div>
+      <router-link to="/auth/login">Login</router-link>
+    </div> -->
     <router-view />
   </div>
 </template>
@@ -18,12 +20,18 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
+$primaryColor: #f8dae2;
+body {
+  margin: 0;
+  background: $primaryColor;
+}
 #app {
   font-family: "Avenir", Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
+  margin: 0px;
 }
 #nav {
   padding: 30px;

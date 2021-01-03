@@ -1,7 +1,6 @@
 <template>
   <div class="login">
     <h2>Login page</h2>
-    <!-- <form class="login_form"> -->
     <input v-model="user.id" placeholder="id" class="input" /><br />
     <input
       v-model="user.password"
@@ -9,9 +8,9 @@
       placeholder="password"
       class="input"
     /><br />
+    <p>{{ message }}</p>
     <button class="button" v-on:click="login">Login</button><br />
-    <router-link to="/signup">SignUp</router-link>
-    <!-- </form> -->
+    <router-link to="/auth/signup">SignUp</router-link>
   </div>
 </template>
 
@@ -24,20 +23,15 @@ export default defineComponent({
   data() {
     return {
       user: { id: "", password: "" },
+      message: "",
     };
   },
   methods: {
     async login() {
-      // fetch(`${serverUrl}`)
-      //   .then((res) => res.json())
-      //   .then((res) => {
-      //     console.log(`${res.users[0].id} 님 환영합니다`, res);
-      //   });
       const request = {
         id: this.user.id,
         password: this.user.password,
       };
-
       const url = `${serverUrl}/auth/login`;
       const response = await fetch(url, {
         method: "post",
@@ -45,44 +39,51 @@ export default defineComponent({
         headers: { "Content-Type": "application/json" },
       });
       const result = await response.json();
-      console.log(result);
-      this.$router.replace("home");
+      console.log(result.ok);
+      if (result.ok == true) {
+        console.log(result.token);
+        document.cookie = `token=${result.token}`;
+
+        this.$router.replace("../home");
+      } else {
+        this.message = "로그인 실패";
+      }
     },
   },
 });
 </script>
 
-<style>
+<style lang="scss">
+$blue: rgb(199, 232, 245);
+$yellow: rgb(252, 245, 230);
+$primaryLight: #fdf2f0;
+$primaryColor: #f8dae2;
+$primaryDark: #b57fb3;
+
 .login {
   display: flex;
   flex-direction: column;
   align-items: center;
   margin-left: 25%;
   margin-right: 25%;
-  padding: 2%;
-  background-color: #fef1e9;
-}
-
-.login_form {
-  margin: 3%;
-  display: flex;
-  align-items: center;
-  flex-direction: column;
+  padding: 4%;
+  background-color: $primaryColor;
 }
 
 .input {
   width: 80%;
-  background-color: #fdebe0;
+  height: 40px;
+  background-color: $primaryLight;
   border: 1px solid white;
 }
 
 .button {
-  width: 100%;
-  height: 30px;
+  width: 84%;
+  height: 50px;
   cursor: pointer;
   border: 1px solid white;
 
-  background-color: rgb(255, 198, 175);
+  background-color: $primaryDark;
 }
 </style>
  

@@ -1,12 +1,10 @@
 <template>
   <div class="signup">
     <h2>SignUp page</h2>
-    <form @submit="onSubmit">
-      <input v-model="id" placeholder="id" /><br />
-      <input v-model="password" placeholder="password" /><br />
-      <button type="submit">SignUp</button>
-      <router-link to="/login"><button>Login</button></router-link>
-    </form>
+    <input v-model="id" class="input" placeholder="id" /><br />
+    <input v-model="password" class="input" placeholder="password" /><br />
+    <button class="button">SignUp</button>
+    <router-link to="/auth/login">Login</router-link>
   </div>
 </template>
 
@@ -27,19 +25,38 @@ export default defineComponent({
 });
 </script>
 
-<style>
-.login {
-  margin-top: 40px;
+
+<style lang="scss">
+$blue: rgb(199, 232, 245);
+$yellow: rgb(252, 245, 230);
+$primaryLight: #fdf2f0;
+$primaryColor: #f8dae2;
+$primaryDark: #b57fb3;
+
+.signup {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-left: 25%;
+  margin-right: 25%;
+  padding: 4%;
+  background-color: $primaryColor;
 }
-input {
-  margin: 10px 0;
-  width: 30%;
-  padding: 15px;
+
+.input {
+  width: 80%;
+  background-color: $primaryLight;
+  border: 1px solid white;
 }
-button {
-  margin: 20px;
-  width: 15%;
+
+.button {
+  width: 85%;
+  height: 50px;
   cursor: pointer;
+  border: 1px solid white;
+
+  background-color: $primaryDark;
 }
 </style>
+ 
  

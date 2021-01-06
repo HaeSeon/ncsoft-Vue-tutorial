@@ -39,12 +39,7 @@
     "parserOptions": {
       "ecmaVersion": 2020
     },
-    "rules": {
-      "variable-name": [
-        true,
-        "allow-leading-underscore"
-      ]
-    }
+    "rules": {}
   },
   "browserslist": [
     "> 1%",

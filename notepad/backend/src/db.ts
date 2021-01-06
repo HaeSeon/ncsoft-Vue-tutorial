@@ -1,54 +1,62 @@
-// mongoose module
-import mongoose, { Document, Mongoose } from 'mongoose'
-mongoose.connect("mongodb://localhost:27017/notepad_db", { useNewUrlParser: true, useUnifiedTopology: true })	//db명
-const db = mongoose.connection
+// mongodb module
+import MongoDB from 'mongodb'
+import assert from "assert"
+import { User } from './User';
+import { Post } from './Post';
 
-// mongoose connection
-db.on('error', console.error.bind(console, `connection error : `))
-db.once('open', () => {
-  console.log(`mongoose connected`)
-})
-
-// generate User schema 
-const UserSchema = new mongoose.Schema({
-  id: String,
-  password: String,
-});
+const url = "mongodb://localhost:27017/notepad_db"
 
 
-interface UserModel extends Document {
-  id: string,
-  password: string
+
+interface Schemas {
+  "user": MongoDB.Collection<User>
+  "post": MongoDB.Collection<Post>
 }
 
-// Accessing a Model
-export const User = mongoose.model<UserModel>("User", UserSchema);
-
-interface PostModel extends Document {
-  // todo : implement here
-  owner_id: string,
-  content: string,
-  create_datetime: number
+interface DatabaseProps {
+  getCollection<K extends keyof Schemas>(collection: K): Schemas[K]
 }
-// generate Post data
-const PostSchema = new mongoose.Schema<PostModel>({
-  owner_id: String,
-  content: String,
-  create_datetime: Number,
-});
-export const Post = mongoose.model<PostModel>("Post", PostSchema)
 
-// let today = new Date();
-// const note = new Post({
-//   owner_id: "5fed5d8dde9a450bf092be9e",
-//   content: "ogu is qquackckckck",
-//   create_datetime: today.getTime(),
-//   important: false
-// })
+class Database implements DatabaseProps {
+  // lazy intialize??
+  private dbNote: MongoDB.Db | undefined
+  private client: MongoDB.MongoClient | undefined;
 
-// save data into mongoDB
-// note.save().then(() => {
-//   console.log(note);
-// }).catch((err) => {
-//   console.log(`Error:${err}`)
-// })
+  constructor() {
+    MongoDB.connect(url, { useUnifiedTopology: true }, (err, client) => {
+      assert.equal(null, err);
+      console.log("Connected correctly to mongodb server");
+      this.client = client
+
+      this.dbNote = client.db("notepad_db")
+      // destuctor..??
+      // client.close();
+    });
+  }
+
+  getCollection<K extends keyof Schemas>(collectionName: K): Schemas[K] {
+    if (!this.client) {
+      throw 'db not initialized'
+    }
+    return this.client.db("notepad_db").collection(collectionName) as Schemas[K]
+  }
+
+  userCollection(): MongoDB.Collection<User> {
+    if (!this.client) {
+      throw `db has not initialized`
+    }
+    return this.client.db("notepad_db").collection("users")
+  }
+  postCollection(): MongoDB.Collection<Post> {
+    if (!this.client) {
+      throw `db has not initialized`
+    }
+    return this.client.db("notepad_db").collection("posts")
+  }
+}
+
+export const db = new Database()
+
+// testing code
+// export const userCollection = db.getCollection("user")
+// export const postCollection = db.getCollection("post")

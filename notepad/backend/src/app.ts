@@ -1,25 +1,44 @@
+import { db } from './db';
+import { ObjectID } from 'mongodb'
+
 // express module
 import express from 'express'
 import jwt from 'jsonwebtoken'
 const app = express();
 const port = 3001;
 
+// const userCollection = db.collection("user")
+
+app.get("/", function (req, res) {
+  console.log(`get ogu`)
+  db.userCollection().findOne({ id: "ogu" }).then((user) => {
+    console.log(user)
+    res.send(user)
+  })
+})
+
+
 app.listen(port, () => {
   console.log(`서버가 ${port}에서 동작중입니다.`);
 });
 
+
 // cors setting
 import cors from "cors"
 import { json } from 'body-parser'
-import { Post, User } from './db';
+import { User } from './User';
+import { Post } from './Post'
 
 app.use(cors());
 app.use(json())
 
 
+import { hash, verify } from 'argon2'
+const salt = Buffer.from('tempsaltforhashpassword', 'utf8');
+
 // // headers must include jwt
 // app.use("/users", function (req, res, next) {
-//   // 방화벽 설정
+//   // 방화벽 설정  
 //   // !req.headers.include(jwt) => throw err
 //   // req.headers.include(jwt) => next()
 //   next()
@@ -28,9 +47,6 @@ app.use(json())
 // HTTP METHOD
 // REST API => only 명사
 // GET, POST, PUT, DELETE
-import { hash, verify } from 'argon2'
-const salt = Buffer.from('tempsaltforhashpassword', 'utf8');
-
 
 app.post("/auth/login", async function login(req, res) {
   const id = req.body.id
@@ -38,8 +54,7 @@ app.post("/auth/login", async function login(req, res) {
     salt
   })
   console.log(id, password)
-
-  const user = await User.findOne({ id: id, password: password }).exec();
+  const user = await db.userCollection().findOne({ id: id, password: password });
   console.log(user)
   if (user) {
     const token = jwt.sign({ id }, 'jinnyyy')
@@ -63,31 +78,32 @@ app.post("/auth/signup", async (req, res) => {
   const password = req.body.password
   console.log(req.body)
 
-  const user = await User.findOne({ id: id }).exec()
+  const user = await db.userCollection().findOne({ id: id })
   if (user) {
     console.log(`user exist ${user.id}`)
     res.status(403).send("user already exist")
     return
   } else {
     const hashPassword = await hash(password, { salt })
-    const newUser = new User(
-      {
-        id,
-        password: hashPassword,
-      }
-    )
-    newUser.save().then(() => {
+    const newUser: User = {
+      id: id,
+      password: hashPassword
+    }
+    const result = await db.userCollection().insertOne(newUser)
+    if (result.result.ok) {
       console.log(`signup passed`)
       const token = jwt.sign({ id }, 'jinnyyy')
       res.send({
         ok: true,
         token
       })
-    })
+    } else {
+      res.status(403).send
+    }
+
+
+
   }
-
-
-
 })
 
 app.get("/auth/user", (req, res) => {
@@ -103,74 +119,78 @@ function getUserIdFromToken(token: string): string {
   const data = jwt.verify(token, "jinnyyy") as any
   return data.id
 }
+
 // 노트 하나를 가져와
-app.get("/notes/:noteId", async (req, res) => {
-  const noteId = req.params.noteId
-  console.log(`get note / note_id : ${noteId}`)
-  const doc = await Post.findById(noteId).exec();
-  if (doc) {
-    res.send(doc)
+app.get("/posts/:postId", async (req, res) => {
+  const postId = req.params.postId
+  console.log(`get post / post_id : ${postId}`)
+  // const post = (await db.postCollection().find().toArray()).find(post =>
+  //   (post as any)._id == postId
+  // )
+  const post = await db.postCollection().findOne({ _id: new ObjectID(postId) })
+  console.log(post)
+  if (post) {
+    res.send(post)
   } else {
-    console.log(`note not exist with id ${noteId}`)
+    console.log(`post not exist with id ${postId} `)
     res.status(403).send('err')
   }
 })
 
 
+
+
 // 노트 생성
-app.post("/notes", (req, res) => {
-  console.log(`create note `)
+app.post("/posts", async (req, res) => {
+  console.log(`create post `)
   const ownerId = req.body.ownerId
   const content = req.body.content
   const createDatetime = new Date().getTime()
-  const post = new Post(
-    {
-      owner_id: ownerId,
-      content: content,
-      create_datetime: createDatetime
-    }
-  )
-  post.save().then(() => {
+  const newPost: Post =
+  {
+    owner_id: ownerId,
+    content: content,
+    create_datetime: createDatetime
+  }
+
+  const result = await db.postCollection().insertOne(newPost)
+  if (result.result.ok) {
     res.send({
       ok: true
-    });
-  }).catch((err) => {
-    res.send({
-      ok: false
     })
-    console.log(`Error:${err}`)
-  })
-  console.log("helell")
+  } else {
+    res.send({ ok: false })
+  }
 })
 
-// 노트 전체 가져오눈거
-app.get("/notes", (req, res) => {
+// 노트 전체 가져오기 -> todo 페이징
+app.get("/posts", async (req, res) => {
   const token = req.headers.token as string
   const userId = getUserIdFromToken(token)
-  Post.find({ owner_id: userId }).then((posts: any) => {
-    console.log(`get ${posts.length} of post`)
+  const posts = await db.postCollection().find({ owner_id: userId }).toArray()
+  // console.log(posts)
+  if (posts) {
     res.send({ posts })
-  })
+  }
 })
 
-app.delete("/notes/:noteId", async (req, res) => {
-  const noteId = req.params.noteId
-  await Post.deleteOne({ _id: noteId });
-  console.log(`note deleted`)
-  res.send({ ok: true })
+app.delete("/posts/:postId", async (req, res) => {
+  const postId = req.params.postId
+  const post = await db.postCollection().deleteOne({ _id: postId });
+  if (post) {
+    console.log(`post deleted`)
+    res.send({ ok: true })
+  }
 })
 
-app.put("/notes/:noteId", async (req, res) => {
-  console.log(`update note `)
-  const noteId = req.params.noteId
-  const note = req.body
+app.put("/posts/:postId", (req, res) => {
+  console.log(`update post `)
+  const postId = req.params.postId
+  const post = req.body
   const createDatetime = new Date().getTime()
-  note.createDatetime = createDatetime
-  await Post.updateOne({ _id: noteId }, note, undefined, (err, res) => {
+  post.createDatetime = createDatetime
+  db.postCollection().updateOne({ _id: postId }, post, (err, res) => {
     console.log(err, res)
   })
   res.send({ ok: true })
 })
-
-
-// PUT : "/users/ogu"

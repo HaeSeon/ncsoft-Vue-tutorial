@@ -1,8 +1,8 @@
 <template>
-  <div class="note-container">
+  <div class="post-container">
     <h1>{{ date }}</h1>
-    <textarea v-model="post.content" rows="13" /><br />
-    <button v-on:click="submitNote">작성 완료</button>
+    <textarea v-model="post.content" rows="13" />
+    <button v-on:click="submitPost">작성 완료</button>
   </div>
 </template>
 
@@ -12,36 +12,36 @@ import { getUserId } from "@/module";
 import { defineComponent } from "vue";
 
 export default defineComponent({
-  name: "Note",
+  name: "Post",
   data() {
     return {
       post: { ownerId: "", content: "" },
     };
   },
   async mounted() {
-    const noteId = new URLSearchParams(location.search).get("note_id");
-    if (!noteId) {
+    const postId = new URLSearchParams(location.search).get("post_id");
+    if (!postId) {
       return;
     }
-    const url = `${serverUrl}/notes/${noteId}`;
+    const url = `${serverUrl}/posts/${postId}`;
     const response = await fetch(url);
     const post = await response.json();
     console.log(post);
     this.post = post;
   },
   methods: {
-    async submitNote() {
+    async submitPost() {
       const userId = await getUserId();
       const timestamp = new Date().getTime();
-      const noteId = new URLSearchParams(location.search).get("note_id");
+      const postId = new URLSearchParams(location.search).get("post_id");
       const request = {
         ownerId: userId,
         content: this.post.content,
       };
-      console.log(noteId);
+      console.log(postId);
       let result;
-      if (!noteId) {
-        const url = `${serverUrl}/notes`;
+      if (!postId) {
+        const url = `${serverUrl}/posts`;
         const response = await fetch(url, {
           method: "post",
           body: JSON.stringify(request),
@@ -49,7 +49,7 @@ export default defineComponent({
         });
         result = await response.json();
       } else {
-        const url = `${serverUrl}/notes/${noteId}`;
+        const url = `${serverUrl}/posts/${postId}`;
         const response = await fetch(url, {
           method: "put",
           body: JSON.stringify(request),
@@ -76,7 +76,7 @@ $primaryLight: #fdf2f0;
 $primaryColor: #f8dae2;
 $primaryDark: #b57fb3;
 
-.note-container {
+.post-container {
   background: $yellow;
   padding: 2%;
   width: 100%;

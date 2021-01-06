@@ -1,8 +1,8 @@
 <template>
-  <div class="note-item" v-on:click="getTodo">
+  <div class="post-item" v-on:click="getTodo">
     <div class="container">
       <p class="date">{{ date }}</p>
-      <button class="delete-button" v-on:click="deleteNote">X</button>
+      <button class="delete-button" v-on:click="deletePost">X</button>
       <p class="content">{{ content }}</p>
     </div>
   </div>
@@ -12,7 +12,7 @@
 import { serverUrl } from "@/main";
 import { convertDatestring } from "@/module";
 export default {
-  name: "NoteItem",
+  name: "PostItem",
   props: {
     _id: String,
     ownerId: String,
@@ -26,10 +26,10 @@ export default {
   },
   methods: {
     getTodo() {
-      location.search = `note_id=${this._id}`;
+      location.search = `post_id=${this._id}`;
     },
-    deleteNote() {
-      const url = `${serverUrl}/notes/${this._id}`;
+    deletePost() {
+      const url = `${serverUrl}/posts/${this._id}`;
       fetch(url, {
         method: "delete",
       }).then(() => {
@@ -46,7 +46,7 @@ export default {
   padding: 0;
 }
 
-.note-item {
+.post-item {
   $blue: rgb(199, 232, 245);
   width: 100px;
   height: 100px;

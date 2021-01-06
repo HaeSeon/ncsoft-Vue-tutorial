@@ -1,8 +1,8 @@
 <template>
-  <div class="notes-container">
-    <ul class="note-list">
-      <div v-for="note in notes" v-bind:key="note.id">
-        <NoteItem v-bind="note" />
+  <div class="posts-container">
+    <ul class="post-list">
+      <div v-for="post in posts" v-bind:key="post.id">
+        <PostItem v-bind="post" />
       </div>
     </ul>
     <button v-on:click="addPost">새로운 노트 작성</button>
@@ -13,7 +13,7 @@
 import { serverUrl } from "@/main";
 import { getToken } from "@/module";
 import { defineComponent, PropType, reactive } from "vue";
-import NoteItemVue from "./NoteItem.vue";
+import PostItemVue from "./PostItem.vue";
 
 interface Post {
   ownerId: string;
@@ -22,21 +22,21 @@ interface Post {
 }
 
 export default defineComponent({
-  name: "NoteList",
+  name: "PostList",
   components: {
-    NoteItem: NoteItemVue,
+    PostItem: PostItemVue,
   },
   props: {
     onSelect: Function,
   },
   data() {
     return {
-      notes: [] as Post[],
+      posts: [] as Post[],
     };
   },
   methods: {
     readPosts: async function () {
-      const url = `${serverUrl}/notes`;
+      const url = `${serverUrl}/posts`;
       const response = await fetch(url, {
         headers: {
           token: getToken(),
@@ -45,7 +45,7 @@ export default defineComponent({
       const res = (await response.json()) as any;
       const posts = res.posts as any[];
 
-      this.notes = posts.map((post) => {
+      this.posts = posts.map((post) => {
         return {
           ownerId: post.owner_id,
           createDatetime: post.create_datetime,
@@ -71,14 +71,14 @@ $primaryLight: #fdf2f0;
 $primaryColor: #f8dae2;
 $primaryDark: #b57fb3;
 
-.notes-container {
+.posts-container {
   background: $primaryDark;
   width: 100%;
   height: 20%;
   padding: 2%;
 }
 
-.note-list {
+.post-list {
   display: flex;
   padding: 0;
   margin: 0;
@@ -92,7 +92,7 @@ button {
 
   background-color: $primaryColor;
 }
-.note-list::-webkit-scrollbar {
+.post-list::-webkit-scrollbar {
   display: none;
 }
 </style>

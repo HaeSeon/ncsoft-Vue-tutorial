@@ -1,19 +1,19 @@
 <template>
   <div class="home">
     <h3>{{ userId }}'s Note</h3>
-    <NoteList />
-    <Note />
+    <PostList />
+    <Post />
   </div>
 </template>
 
 <script lang="ts">
 import { getUserId } from "@/module";
 import { defineComponent } from "vue";
-import Note from "./Note.vue";
-import NoteList from "./NoteList.vue";
+import Post from "./Post.vue";
+import PostList from "./PostList.vue";
 
 export default defineComponent({
-  components: { NoteList, Note },
+  components: { PostList, Post },
   name: "Home",
   data() {
     return {
@@ -45,10 +45,6 @@ $primaryDark: #b57fb3;
   // margin-right: 5%;
   padding: 2%;
   background-color: $primaryColor;
-
-  .notes-container {
-    margin-top: 16px;
-  }
 }
 </style>
  

@@ -1,15 +1,15 @@
 <template>
   <div class="login">
     <h2>Login page</h2>
-    <input v-model="user.id" placeholder="id" class="input" /><br />
+    <input v-model="user.id" placeholder="id" class="input" />
     <input
       v-model="user.password"
       type="password"
       placeholder="password"
       class="input"
-    /><br />
+    />
     <p>{{ message }}</p>
-    <button class="button" v-on:click="login">Login</button><br />
+    <button class="button" v-on:click="login">Login</button>
     <router-link to="/signup">SignUp</router-link>
   </div>
 </template>

@@ -27,69 +27,13 @@
       <div @click="handlePressNum('0')">0</div>
       <div @click="handlePressNum('00')">00</div>
       <div @click="handlePressNum('.')">.</div>
-      <div @click="handlePreeEnter">=</div>
+      <div @click="handlePressEnter">=</div>
     </div>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
-
-// function add(firstNum: number, secondNum: number) {
-//   return firstNum + secondNum;
-// }
-
-// function add_(input: { num1: number; num2: number }) {
-//   return input.num1 + input.num2;
-// }
-
-// interface User {
-//   name: string;
-//   pn: string;
-//   address: string;
-//   password: string;
-// }
-
-// const ogu: User = {
-//   name: "오구",
-//   pn: "5959",
-//   password: "이해선욤뇸",
-//   address: "문래파라곤해서니방",
-// };
-
-// getUser(ogu);
-
-// function getUser(user: {
-//   name: string;
-//   pn?: string;
-//   address: string;
-//   password?: string;
-// }) {
-//   return true;
-// }
-
-// function main() {
-//   add(1, 2);
-//   add_({
-//     num1: 1,
-//     num2: 2,
-//   });
-// }
-
-// example
-// const CalcFunctions: Record<Operator, Function> = {
-//   "+": (a: number, b: number): number => a + b,
-//   "-": (a: number, b: number): number => a - b,
-//   "*": () => {},
-//   "/": () => {},
-// };
-
-// function main() {
-//   const firstNum = 1;
-//   const secondNum = 2;
-//   const sumResult = CalcFunctions["+"](firstNum, secondNum);
-//   console.log(sumResult);
-// }
 
 type Operator = "+" | "-" | "*" | "/";
 interface CalculateFunction {
@@ -109,7 +53,8 @@ interface CalculatorData {
   fromEnter: boolean;
   op: Operator | undefined;
   view: string;
-  memory: string;
+  positiveMemory: string;
+  negativeMenory: string;
 }
 
 export default defineComponent({
@@ -121,21 +66,28 @@ export default defineComponent({
       fromEnter: false,
       op: undefined,
       view: "0",
-      memory: "",
+      positiveMemory: "",
+      negativeMenory: "",
     };
   },
   methods: {
     handleMC() {
-      console.log("MC");
+      this.positiveMemory = "";
+      this.negativeMenory = "";
     },
     handleMR() {
-      console.log("MR");
+      this.view = String(
+        Number(this.positiveMemory) + Number(this.negativeMenory)
+      );
+      console.log(this.positiveMemory, this.negativeMenory);
     },
-    handleMpluse() {
-      console.log("MC");
+    handleMplus() {
+      this.positiveMemory = String(Math.abs(Number(this.inputNum)));
+      console.log(`positive memory is ${this.positiveMemory}`);
     },
     handleMminus() {
-      console.log("MC");
+      this.negativeMenory = String(-Math.abs(Number(this.inputNum)));
+      console.log(`negative memory is ${this.negativeMenory}`);
     },
     handlePressNum(num: string) {
       if (this.fromEnter === true) {
@@ -206,7 +158,7 @@ export default defineComponent({
       this.view = this.resultNum;
     },
     handlePressNegate() {
-      if (this.fromEnter === true) {
+      if (this.fromEnter) {
         // 3+3=6 에서 negate(6) 을 처리할 경우
         this.resultNum = String(-Number(this.resultNum));
         this.view = this.resultNum;

@@ -120,14 +120,14 @@ function getUserIdFromToken(token: string): string {
   return data.id
 }
 
-// 노트 하나를 가져와
+// 노트 하나 가져오기
 app.get("/posts/:postId", async (req, res) => {
   const postId = req.params.postId
   console.log(`get post / post_id : ${postId}`)
   // const post = (await db.postCollection().find().toArray()).find(post =>
   //   (post as any)._id == postId
   // )
-  const post = await db.postCollection().findOne({ _id: new ObjectID(postId) })
+  const post = await db.postCollection().({ _id: new ObjectID(postId) })
   console.log(post)
   if (post) {
     res.send(post)

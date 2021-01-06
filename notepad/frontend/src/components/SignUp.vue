@@ -4,7 +4,7 @@
     <input v-model="user.id" class="input" placeholder="id" />
     <input v-model="user.password" class="input" placeholder="password" />
     <button class="button" v-on:click="signUp">SignUp</button>
-    <router-link to="/auth/login">Login</router-link>
+    <router-link to="/login">Login</router-link>
   </div>
 </template>
 
@@ -71,6 +71,7 @@ $primaryDark: #b57fb3;
   height: 40px;
   background-color: $primaryLight;
   border: 1px solid white;
+  margin: 10px;
 }
 
 h2 {
@@ -78,7 +79,8 @@ h2 {
 }
 
 .button {
-  width: 84%;
+  width: 80%;
+  margin: 10px;
   height: 50px;
   cursor: pointer;
   border: 1px solid white;

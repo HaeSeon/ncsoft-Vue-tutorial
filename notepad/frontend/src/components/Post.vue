@@ -1,7 +1,7 @@
 <template>
   <div class="post-container">
     <h1>{{ date }}</h1>
-    <textarea v-model="post.content" rows="13" />
+    <div><textarea v-model="post.content" rows="13" /></div>
     <button v-on:click="submitPost">작성 완료</button>
   </div>
 </template>

@@ -77,6 +77,7 @@ $primaryDark: #b57fb3;
   height: 40px;
   background-color: $primaryLight;
   border: 1px solid white;
+  margin: 10px;
 }
 
 h2 {
@@ -84,7 +85,8 @@ h2 {
 }
 
 .button {
-  width: 84%;
+  margin: 10px;
+  width: 80%;
   height: 50px;
   cursor: pointer;
   border: 1px solid white;

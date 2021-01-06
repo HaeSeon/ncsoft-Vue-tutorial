@@ -82,7 +82,6 @@ $primaryDark: #b57fb3;
   display: flex;
   padding: 0;
   margin: 0;
-
   overflow-x: scroll;
 }
 button {

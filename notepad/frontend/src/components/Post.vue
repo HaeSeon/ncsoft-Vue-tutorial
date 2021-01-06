@@ -1,93 +1,86 @@
 <template>
-  <div class="post-container">
-    <h1>{{ date }}</h1>
-    <div><textarea v-model="post.content" rows="13" /></div>
-    <button v-on:click="submitPost">작성 완료</button>
+  <div class="post-item" v-on:click="getTodo">
+    <div class="container">
+      <p class="date">{{ date }}</p>
+      <button class="delete-button" v-on:click="deletePost">X</button>
+      <p class="content">{{ content }}</p>
+    </div>
   </div>
 </template>
 
-<script lang="ts">
+<script>
 import { serverUrl } from "@/main";
-import { getUserId } from "@/module";
-import { defineComponent } from "vue";
-
-export default defineComponent({
+import { convertDatestring } from "@/module";
+export default {
   name: "Post",
+  props: {
+    _id: String,
+    ownerId: String,
+    content: String,
+    createDatetime: Number,
+  },
   data() {
     return {
-      post: { ownerId: "", content: "" },
+      date: convertDatestring(this.createDatetime || 1),
     };
   },
-  async mounted() {
-    const postId = new URLSearchParams(location.search).get("post_id");
-    if (!postId) {
-      return;
-    }
-    const url = `${serverUrl}/posts/${postId}`;
-    const response = await fetch(url);
-    const post = await response.json();
-    console.log(post);
-    this.post = post;
-  },
   methods: {
-    async submitPost() {
-      const userId = await getUserId();
-      const timestamp = new Date().getTime();
-      const postId = new URLSearchParams(location.search).get("post_id");
-      const request = {
-        ownerId: userId,
-        content: this.post.content,
-      };
-      console.log(postId);
-      let result;
-      if (!postId) {
-        const url = `${serverUrl}/posts`;
-        const response = await fetch(url, {
-          method: "post",
-          body: JSON.stringify(request),
-          headers: { "Content-Type": "application/json" },
-        });
-        result = await response.json();
-      } else {
-        const url = `${serverUrl}/posts/${postId}`;
-        const response = await fetch(url, {
-          method: "put",
-          body: JSON.stringify(request),
-          headers: { "Content-Type": "application/json" },
-        });
-        result = await response.json();
-      }
-      console.log(result.ok);
-      if (result.ok == true) {
-        // alert("저장 완료");
+    getTodo() {
+      location.search = `post_id=${this._id}`;
+    },
+    deletePost() {
+      const url = `${serverUrl}/posts/${this._id}`;
+      fetch(url, {
+        method: "delete",
+      }).then(() => {
         location.reload();
-      } else {
-        alert("노트 저장 실패");
-      }
+      });
     },
   },
-});
+};
 </script>
 
 <style lang="scss">
-$blue: rgb(199, 232, 245);
-$yellow: rgb(252, 245, 230);
-$primaryLight: #fdf2f0;
-$primaryColor: #f8dae2;
-$primaryDark: #b57fb3;
-
-.post-container {
-  background: $yellow;
-  padding: 2%;
-  width: 100%;
-  height: 80%;
+* {
+  margin: 0;
+  padding: 0;
 }
 
-textarea {
-  background: $yellow;
-  border: 0px;
-  width: 90%;
-  font-size: 2em;
+.post-item {
+  $blue: rgb(199, 232, 245);
+  width: 100px;
+  height: 100px;
+
+  background: $blue;
+
+  padding: 8px;
+  margin: 8px;
+
+  .container {
+    display: grid;
+    grid-template-columns: auto min-content;
+    grid-template-rows: min-content auto;
+
+    height: 100%;
+
+    .date {
+      font-size: 12px;
+      width: fit-content;
+    }
+
+    .delete-button {
+      background: none;
+      border: none;
+      outline: none;
+      cursor: pointer;
+      padding: 4px;
+    }
+
+    .content {
+      grid-column-start: 1;
+      grid-column-end: 3;
+      overflow: hidden;
+    }
+  }
 }
 </style>
- 

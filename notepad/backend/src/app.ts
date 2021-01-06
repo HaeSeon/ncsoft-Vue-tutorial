@@ -7,17 +7,6 @@ import jwt from 'jsonwebtoken'
 const app = express();
 const port = 3001;
 
-// const userCollection = db.collection("user")
-
-app.get("/", function (req, res) {
-  console.log(`get ogu`)
-  db.userCollection().findOne({ id: "ogu" }).then((user) => {
-    console.log(user)
-    res.send(user)
-  })
-})
-
-
 app.listen(port, () => {
   console.log(`서버가 ${port}에서 동작중입니다.`);
 });
@@ -73,11 +62,8 @@ app.post("/auth/login", async function login(req, res) {
 })
 
 app.post("/auth/signup", async (req, res) => {
-  console.log(`do sign up`)
   const id = req.body.id
   const password = req.body.password
-  console.log(req.body)
-
   const user = await db.userCollection().findOne({ id: id })
   if (user) {
     console.log(`user exist ${user.id}`)
@@ -124,11 +110,7 @@ function getUserIdFromToken(token: string): string {
 app.get("/posts/:postId", async (req, res) => {
   const postId = req.params.postId
   console.log(`get post / post_id : ${postId}`)
-  // const post = (await db.postCollection().find().toArray()).find(post =>
-  //   (post as any)._id == postId
-  // )
-  const post = await db.postCollection().({ _id: new ObjectID(postId) })
-  console.log(post)
+  const post = await db.postCollection().findOne({ _id: new ObjectID(postId) })
   if (post) {
     res.send(post)
   } else {
@@ -168,7 +150,6 @@ app.get("/posts", async (req, res) => {
   const token = req.headers.token as string
   const userId = getUserIdFromToken(token)
   const posts = await db.postCollection().find({ owner_id: userId }).toArray()
-  // console.log(posts)
   if (posts) {
     res.send({ posts })
   }
@@ -184,13 +165,11 @@ app.delete("/posts/:postId", async (req, res) => {
 })
 
 app.put("/posts/:postId", (req, res) => {
-  console.log(`update post `)
   const postId = req.params.postId
   const post = req.body
   const createDatetime = new Date().getTime()
   post.createDatetime = createDatetime
-  db.postCollection().updateOne({ _id: postId }, post, (err, res) => {
-    console.log(err, res)
-  })
+  db.postCollection().updateOne({ _id: new ObjectID(postId) }, { $set: post })
+  console.log(`update post`)
   res.send({ ok: true })
 })

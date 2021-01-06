@@ -1,19 +1,19 @@
 <template>
   <div class="home">
     <h3>{{ userId }}'s Note</h3>
-    <PostList />
-    <Post />
+    <Posts />
+    <PostForm />
   </div>
 </template>
 
 <script lang="ts">
 import { getUserId } from "@/module";
 import { defineComponent } from "vue";
-import Post from "./Post.vue";
-import PostList from "./PostList.vue";
+import PostForm from "./PostForm.vue";
+import Posts from "./Posts.vue";
 
 export default defineComponent({
-  components: { PostList, Post },
+  components: { Posts, PostForm },
   name: "Home",
   data() {
     return {

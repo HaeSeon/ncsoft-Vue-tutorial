@@ -6,8 +6,6 @@ import { Post } from './Post';
 
 const url = "mongodb://localhost:27017/notepad_db"
 
-
-
 interface Schemas {
   "user": MongoDB.Collection<User>
   "post": MongoDB.Collection<Post>
@@ -27,7 +25,6 @@ class Database implements DatabaseProps {
       assert.equal(null, err);
       console.log("Connected correctly to mongodb server");
       this.client = client
-
       this.dbNote = client.db("notepad_db")
       // destuctor..??
       // client.close();

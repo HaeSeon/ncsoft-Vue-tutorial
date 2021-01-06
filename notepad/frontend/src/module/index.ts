@@ -23,7 +23,7 @@ export async function getUserId(): Promise<string> {
   });
   const userId = (await response.json()).id;
   if (!userId) {
-    throw "oguogu";
+    throw "can not get userId";
   }
   return userId as string
 }

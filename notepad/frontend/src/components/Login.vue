@@ -39,9 +39,7 @@ export default defineComponent({
         headers: { "Content-Type": "application/json" },
       });
       const result = await response.json();
-      console.log(result.ok);
       if (result.ok == true) {
-        console.log(result.token);
         document.cookie = "";
         document.cookie = `token=${result.token}`;
 

@@ -2,7 +2,7 @@
   <div class="posts-container">
     <ul class="post-list">
       <div v-for="post in posts" v-bind:key="post.id">
-        <PostItem v-bind="post" />
+        <Post v-bind="post" />
       </div>
     </ul>
     <button v-on:click="addPost">새로운 노트 작성</button>
@@ -13,7 +13,7 @@
 import { serverUrl } from "@/main";
 import { getToken } from "@/module";
 import { defineComponent, PropType, reactive } from "vue";
-import PostItemVue from "./PostItem.vue";
+import Post from "./Post.vue";
 
 interface Post {
   ownerId: string;
@@ -22,9 +22,9 @@ interface Post {
 }
 
 export default defineComponent({
-  name: "PostList",
+  name: "Posts",
   components: {
-    PostItem: PostItemVue,
+    Post: Post,
   },
   props: {
     onSelect: Function,

@@ -48,9 +48,9 @@ const calcFuncs: Record<Operator, CalculateFunction> = {
 };
 
 interface CalculatorData {
-  inputNum: string;
-  resultNum: string;
-  fromEnter: boolean;
+  numDisplay: string;
+  numCache: string;
+  isFromEnter: boolean;
   op: Operator | undefined;
   view: string;
   positiveMemory: string;
@@ -61,9 +61,9 @@ export default defineComponent({
   name: "CalculatorApp",
   data(): CalculatorData {
     return {
-      inputNum: "0",
-      resultNum: "0",
-      fromEnter: false,
+      numDisplay: "0",
+      numCache: "0",
+      isFromEnter: false,
       op: undefined,
       view: "0",
       positiveMemory: "",
@@ -77,113 +77,119 @@ export default defineComponent({
     },
     handleMR() {
       this.view = String(
-        Number(this.positiveMemory) + Number(this.negativeMenory)
+        parseFloat(this.positiveMemory) + parseFloat(this.negativeMenory)
       );
       console.log(this.positiveMemory, this.negativeMenory);
     },
     handleMplus() {
-      this.positiveMemory = String(Math.abs(Number(this.inputNum)));
+      this.positiveMemory = String(Math.abs(parseFloat(this.numDisplay)));
       console.log(`positive memory is ${this.positiveMemory}`);
     },
     handleMminus() {
-      this.negativeMenory = String(-Math.abs(Number(this.inputNum)));
+      this.negativeMenory = String(-Math.abs(parseFloat(this.numDisplay)));
       console.log(`negative memory is ${this.negativeMenory}`);
     },
     handlePressNum(num: string) {
-      if (this.fromEnter === true) {
+      if (this.isFromEnter === true) {
         // 1+1=2 하고 AC버튼 없이 숫자를 눌렀을 경우
-        this.resultNum = "";
-        if (num === "." && this.resultNum.includes(".")) {
+        this.numCache = "";
+        if (num === "." && this.numCache.includes(".")) {
           console.log("dot duplicated");
-        } else if (num != "." && this.resultNum === "0") {
-          this.resultNum = `${num}`;
+        } else if (num !== "." && this.numCache === "0") {
+          this.numCache = `${num}`;
         } else {
-          this.resultNum = `${this.resultNum}${num}`;
+          this.numCache = `${this.numCache}${num}`;
         }
-        this.view = this.resultNum;
-        this.fromEnter = false;
+        this.view = this.numCache;
+        this.isFromEnter = false;
       } else {
-        if (num === "." && this.inputNum.includes(".")) {
+        if (num === "." && this.numDisplay.includes(".")) {
           console.log("dot duplicated");
-        } else if (num != "." && this.inputNum === "0") {
-          this.inputNum = `${num}`;
+        } else if (num !== "." && this.numDisplay === "0") {
+          this.numDisplay = `${num}`;
         } else {
-          this.inputNum = `${this.inputNum}${num}`;
+          this.numDisplay = `${this.numDisplay}${num}`;
         }
         console.log(
           "op : ",
           this.op,
-          "inputNum : ",
-          this.inputNum,
-          "resultNum : ",
-          this.resultNum
+          "numDisplay : ",
+          this.numDisplay,
+          "numCache : ",
+          this.numCache
         );
-        this.view = this.inputNum;
+        this.view = this.numDisplay;
       }
     },
     handlePressOp(op: Operator) {
-      if (this.inputNum != "") {
+      if (this.numDisplay) {
         //operation만 여러번 눌렀을 때 대비
-        if (this.resultNum === "") {
+        if (!this.numCache) {
           // 이전 결과값이 없으면
-          this.resultNum = this.inputNum;
-        } else if (this.fromEnter === true) {
+          this.numCache = this.numDisplay;
+        } else if (this.isFromEnter === true) {
           // 이전값이 넘어온 경로가 pressEnter이면
           console.log("pass");
         } else {
           // 이전값이 넘어온 경로가 handlePressOp이면
-          this.resultNum = String(
-            calcFuncs[op](Number(this.resultNum), Number(this.inputNum))
+          this.numCache = String(
+            calcFuncs[op](
+              parseFloat(this.numCache),
+              parseFloat(this.numDisplay)
+            )
           );
         }
-        this.view = this.resultNum;
-        this.inputNum = "";
+        this.view = this.numCache;
+        this.numDisplay = "";
       }
       this.op = op;
-      this.fromEnter = false;
+      this.isFromEnter = false;
     },
     handlePressEnter() {
-      if (this.inputNum === "") {
+      if (!this.numDisplay) {
         // 3+ = = = 처리
-        this.inputNum = this.resultNum;
+        this.numDisplay = this.numCache;
       }
       if (this.op) {
-        this.resultNum = String(
-          calcFuncs[this.op](Number(this.resultNum), Number(this.inputNum))
+        this.numCache = String(
+          calcFuncs[this.op](
+            parseFloat(this.numCache),
+            parseFloat(this.numDisplay)
+          )
         );
       } else {
         throw "";
       }
-      this.fromEnter = true;
-      this.view = this.resultNum;
+      this.isFromEnter = true;
+      this.view = this.numCache;
     },
     handlePressNegate() {
-      if (this.fromEnter) {
+      if (this.isFromEnter) {
         // 3+3=6 에서 negate(6) 을 처리할 경우
-        this.resultNum = String(-Number(this.resultNum));
-        this.view = this.resultNum;
+        this.numCache = String(-parseFloat(this.numCache));
+        this.view = this.numCache;
       } else {
-        if (this.inputNum != "") {
+        if (this.numDisplay) {
           //negate(3)=-3
-          this.inputNum = String(-Number(this.inputNum));
+          this.numDisplay = String(-parseFloat(this.numDisplay));
         } else {
           // 5 + negate() -> 5+negate(5)=0
-          this.inputNum = String(-Number(this.resultNum));
+          this.numDisplay = String(-parseFloat(this.numCache));
         }
-        this.view = this.inputNum;
+        this.view = this.numDisplay;
       }
       console.log(
         "op : ",
         this.op,
-        "inputNum : ",
-        this.inputNum,
-        "resultNum : ",
-        this.resultNum
+        "numDisplay : ",
+        this.numDisplay,
+        "numCache : ",
+        this.numCache
       );
     },
     handlepressAC() {
-      this.resultNum = "";
-      this.inputNum = "";
+      this.numCache = "";
+      this.numDisplay = "";
       this.view = "0";
       this.op = undefined;
     },

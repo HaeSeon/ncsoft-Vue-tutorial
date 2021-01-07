@@ -1,43 +1,30 @@
-import { db } from './db';
-import { ObjectID } from 'mongodb'
-
 // express module
 import express from 'express'
-import jwt from 'jsonwebtoken'
-const app = express();
-const port = 3001;
-
-app.listen(port, () => {
-  console.log(`서버가 ${port}에서 동작중입니다.`);
-});
-
-
+export const app = express();
 // cors setting
 import cors from "cors"
 import { json } from 'body-parser'
-import { User } from './User';
-import { Post } from './Post'
+
+import { User } from './model/User';
+import { hash } from 'argon2'
+import jwt from 'jsonwebtoken'
+import { db } from './db';
+import { ObjectID } from 'mongodb'
+import { Post } from './model/Post';
+import { getUserIdFromToken } from './module/user-module'
+
+const port = 3001;
+app.listen(port, () => {
+  console.log(`서버가 ${port}에서 동작중입니다.`);
+});
 
 app.use(cors());
 app.use(json())
 
 
-import { hash, verify } from 'argon2'
 const salt = Buffer.from('tempsaltforhashpassword', 'utf8');
 
-// // headers must include jwt
-// app.use("/users", function (req, res, next) {
-//   // 방화벽 설정  
-//   // !req.headers.include(jwt) => throw err
-//   // req.headers.include(jwt) => next()
-//   next()
-// })
-
-// HTTP METHOD
-// REST API => only 명사
-// GET, POST, PUT, DELETE
-
-app.post("/auth/login", async function login(req, res) {
+app.post("/auth/login", async (req, res) => {
   const id = req.body.id
   const password = await hash(req.body.password, {
     salt
@@ -86,9 +73,6 @@ app.post("/auth/signup", async (req, res) => {
     } else {
       res.status(403).send
     }
-
-
-
   }
 })
 
@@ -101,12 +85,8 @@ app.get("/auth/user", (req, res) => {
   })
 })
 
-function getUserIdFromToken(token: string): string {
-  const data = jwt.verify(token, "jinnyyy") as any
-  return data.id
-}
 
-// 노트 하나 가져오기
+// get a post
 app.get("/posts/:postId", async (req, res) => {
   const postId = req.params.postId
   console.log(`get post / post_id : ${postId}`)
@@ -119,10 +99,7 @@ app.get("/posts/:postId", async (req, res) => {
   }
 })
 
-
-
-
-// 노트 생성
+// create a post
 app.post("/posts", async (req, res) => {
   console.log(`create post `)
   const ownerId = req.body.ownerId
@@ -134,7 +111,6 @@ app.post("/posts", async (req, res) => {
     content: content,
     create_datetime: createDatetime
   }
-
   const result = await db.postCollection().insertOne(newPost)
   if (result.result.ok) {
     res.send({
@@ -145,7 +121,7 @@ app.post("/posts", async (req, res) => {
   }
 })
 
-// 노트 전체 가져오기 -> todo 페이징
+// get all posts
 app.get("/posts", async (req, res) => {
   const token = req.headers.token as string
   const userId = getUserIdFromToken(token)
@@ -155,6 +131,7 @@ app.get("/posts", async (req, res) => {
   }
 })
 
+// delete a post
 app.delete("/posts/:postId", async (req, res) => {
   const postId = req.params.postId
   const post = await db.postCollection().deleteOne({ _id: postId });
@@ -164,6 +141,7 @@ app.delete("/posts/:postId", async (req, res) => {
   }
 })
 
+// update a post
 app.put("/posts/:postId", (req, res) => {
   const postId = req.params.postId
   const post = req.body

@@ -1,8 +1,8 @@
 // mongodb module
 import MongoDB from 'mongodb'
 import assert from "assert"
-import { User } from './User';
-import { Post } from './Post';
+import { User } from './model/User';
+import { Post } from './model/Post';
 
 const url = "mongodb://localhost:27017/notepad_db"
 

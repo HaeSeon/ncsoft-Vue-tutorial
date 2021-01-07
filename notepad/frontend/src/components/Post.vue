@@ -1,5 +1,5 @@
 <template>
-  <div class="post-item" v-on:click="getTodo">
+  <div class="post-item" v-on:click="getOnePost">
     <div class="container">
       <p class="date">{{ date }}</p>
       <button class="delete-button" v-on:click="deletePost">X</button>
@@ -25,7 +25,7 @@ export default {
     };
   },
   methods: {
-    getTodo() {
+    getOnePost() {
       location.search = `post_id=${this._id}`;
     },
     deletePost() {
@@ -33,7 +33,7 @@ export default {
       fetch(url, {
         method: "delete",
       }).then(() => {
-        location.reload();
+        location.search = ``;
       });
     },
   },

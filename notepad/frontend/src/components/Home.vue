@@ -37,14 +37,17 @@ $primaryLight: #fdf2f0;
 $primaryColor: #f8dae2;
 $primaryDark: #b57fb3;
 .home {
-  margin: 2%;
+  margin-right: 10%;
+  margin-left: 10%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  // margin-left: 5%;
-  // margin-right: 5%;
   padding: 2%;
   background-color: $primaryColor;
+}
+
+h3 {
+  margin: 2%;
 }
 </style>
  

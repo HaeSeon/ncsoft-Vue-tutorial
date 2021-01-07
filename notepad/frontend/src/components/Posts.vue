@@ -1,6 +1,6 @@
 <template>
   <div class="posts-container">
-    <ul ref="todolist" class="post-list">
+    <ul ref="postsContainer" class="post-list">
       <div v-for="post in posts" v-bind:key="post.id">
         <Post v-bind="post" />
       </div>
@@ -64,16 +64,14 @@ export default defineComponent({
       location.search = "";
     },
     scroll() {
-      const $todolist = this.$refs.todolist as HTMLUListElement;
-
-      $todolist.onscroll = () => {
-        const totalWidth = $todolist.scrollWidth;
-        const currentScroll = $todolist.clientWidth + $todolist.scrollLeft;
+      const $postsContainer = this.$refs.postsContainer as HTMLUListElement;
+      $postsContainer.onscroll = () => {
+        const totalWidth = $postsContainer.scrollWidth;
+        const currentScroll =
+          $postsContainer.clientWidth + $postsContainer.scrollLeft;
         if (currentScroll + 10 >= totalWidth && !this.isLoading) {
-          console.log(`load more`);
           // load more
           this.readPosts();
-          console.log("current loaded post : ", this.posts.length);
         }
       };
     },

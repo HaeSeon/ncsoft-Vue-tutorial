@@ -6,7 +6,7 @@ import cors from "cors"
 import { json } from 'body-parser'
 
 import { User } from './model/User';
-import { hash } from 'argon2'
+import { hash, verify } from 'argon2'
 import jwt from 'jsonwebtoken'
 import { db } from './db';
 import { ObjectID } from 'mongodb'
@@ -21,16 +21,24 @@ app.listen(port, () => {
 app.use(cors());
 app.use(json())
 
-
-const salt = Buffer.from('tempsaltforhashpassword', 'utf8');
-
 app.post("/auth/login", async (req, res) => {
   const id = req.body.id
-  const password = await hash(req.body.password, {
-    salt
-  })
+  const password = req.body.password;
+
+  const user = await db.userCollection().findOne({ id: id });
+  if (!user) {
+    throw `user not exist with id ${id}`
+  }
+
+  const isVerified = (hashed: string, target: string) => {
+    return verify(hashed, target)
+  }
+
+  if (!isVerified(user.password, password)) {
+    throw `password invalid`
+  }
+
   console.log(id, password)
-  const user = await db.userCollection().findOne({ id: id, password: password });
   console.log(user)
   if (user) {
     const token = jwt.sign({ id }, 'jinnyyy')
@@ -57,7 +65,8 @@ app.post("/auth/signup", async (req, res) => {
     res.status(403).send("user already exist")
     return
   } else {
-    const hashPassword = await hash(password, { salt })
+    const hashPassword = await hash(password)
+
     const newUser: User = {
       id: id,
       password: hashPassword
@@ -121,13 +130,16 @@ app.post("/posts", async (req, res) => {
   }
 })
 
+
 // get all posts
+// /posts?start=13
 app.get("/posts", async (req, res) => {
-  const dataNum = (parseInt(req.params.page) - 1) * 10;
-  console.log(dataNum)
+  const startAt = parseInt(req.query.start as string, 10)
+  const batch = 10
   const token = req.headers.token as string
   const userId = getUserIdFromToken(token)
-  const posts = await db.postCollection().find({ owner_id: userId }).skip(dataNum).limit(10).toArray()
+  console.log(`get posts from ${userId} start at ${startAt}`)
+  const posts = await db.postCollection().find({ owner_id: userId }).skip(startAt || 0).limit(batch).toArray()
   if (posts) {
     res.send({ posts })
   }
@@ -136,10 +148,14 @@ app.get("/posts", async (req, res) => {
 // delete a post
 app.delete("/posts/:postId", async (req, res) => {
   const postId = req.params.postId
-  const post = await db.postCollection().deleteOne({ _id: postId });
+  console.log(`delete post / postid : ${postId}`)
+  const post = await db.postCollection().deleteOne({ _id: new ObjectID(postId) });
   if (post) {
     console.log(`post deleted`)
     res.send({ ok: true })
+  } else {
+    console.log(`post not exist`)
+    res.status(403).send(`cannot delete post not exist`)
   }
 })
 

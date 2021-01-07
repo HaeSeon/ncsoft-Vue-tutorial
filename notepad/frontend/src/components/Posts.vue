@@ -1,6 +1,6 @@
 <template>
   <div class="posts-container">
-    <ul class="post-list">
+    <ul ref="todolist" class="post-list">
       <div v-for="post in posts" v-bind:key="post.id">
         <Post v-bind="post" />
       </div>
@@ -31,14 +31,15 @@ export default defineComponent({
   },
   data() {
     return {
+      isLoading: false,
       posts: [] as Post[],
       scrolledToBottom: false,
-      limit: 0,
     };
   },
   methods: {
     readPosts: async function () {
-      const url = `${serverUrl}/posts`;
+      this.isLoading = true;
+      const url = `${serverUrl}/posts?start=${this.posts.length}`;
       const response = await fetch(url, {
         headers: {
           token: getToken(),
@@ -47,25 +48,32 @@ export default defineComponent({
       const res = (await response.json()) as any;
       const posts = res.posts as any[];
 
-      this.posts = posts.map((post) => {
-        return {
-          ownerId: post.owner_id,
-          createDatetime: post.create_datetime,
-          content: post.content,
-          _id: post._id,
-        };
-      });
+      this.posts.push(
+        ...posts.map((post) => {
+          return {
+            ownerId: post.owner_id,
+            createDatetime: post.create_datetime,
+            content: post.content,
+            _id: post._id,
+          };
+        })
+      );
+      this.isLoading = false;
     },
     addPost() {
       location.search = "";
     },
     scroll() {
-      window.onscroll = () => {
-        let scrollHeight = Math.max(document.documentElement.);
-        if (bottomOfWindow) {
-          this.scrolledToBottom = true;
-          // this.pageNum += 1;
-          console.log("jsjd");
+      const $todolist = this.$refs.todolist as HTMLUListElement;
+
+      $todolist.onscroll = () => {
+        const totalWidth = $todolist.scrollWidth;
+        const currentScroll = $todolist.clientWidth + $todolist.scrollLeft;
+        if (currentScroll + 10 >= totalWidth && !this.isLoading) {
+          console.log(`load more`);
+          // load more
+          this.readPosts();
+          console.log("current loaded post : ", this.posts.length);
         }
       };
     },

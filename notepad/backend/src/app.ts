@@ -123,9 +123,11 @@ app.post("/posts", async (req, res) => {
 
 // get all posts
 app.get("/posts", async (req, res) => {
+  const dataNum = (parseInt(req.params.page) - 1) * 10;
+  console.log(dataNum)
   const token = req.headers.token as string
   const userId = getUserIdFromToken(token)
-  const posts = await db.postCollection().find({ owner_id: userId }).toArray()
+  const posts = await db.postCollection().find({ owner_id: userId }).skip(dataNum).limit(10).toArray()
   if (posts) {
     res.send({ posts })
   }

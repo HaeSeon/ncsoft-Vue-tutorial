@@ -10,21 +10,21 @@
       <div @click="handleMplus">M+</div>
       <div @click="handlePressOp('/')">÷</div>
       <div @click="handlePressNegate">+/-</div>
-      <div @click="handlePressNum('7')">7</div>
-      <div @click="handlePressNum('8')">8</div>
-      <div @click="handlePressNum('9')">9</div>
+      <div @click="handlePressNum(7)">7</div>
+      <div @click="handlePressNum(8)">8</div>
+      <div @click="handlePressNum(9)">9</div>
       <div @click="handlePressOp('*')">X</div>
       <div @click="handlepressAC()">C</div>
-      <div @click="handlePressNum('4')">4</div>
-      <div @click="handlePressNum('5')">5</div>
-      <div @click="handlePressNum('6')">6</div>
+      <div @click="handlePressNum(4)">4</div>
+      <div @click="handlePressNum(5)">5</div>
+      <div @click="handlePressNum(6)">6</div>
       <div @click="handlePressOp('-')">-</div>
       <div @click="handlepressAC()">AC</div>
-      <div @click="handlePressNum('1')">1</div>
-      <div @click="handlePressNum('2')">2</div>
-      <div @click="handlePressNum('3')">3</div>
+      <div @click="handlePressNum(1)">1</div>
+      <div @click="handlePressNum(2)">2</div>
+      <div @click="handlePressNum(3)">3</div>
       <div class="plus" @click="handlePressOp('+')">+</div>
-      <div @click="handlePressNum('0')">0</div>
+      <div @click="handlePressNum(0)">0</div>
       <div @click="handlePressNum('00')">00</div>
       <div @click="handlePressNum('.')">.</div>
       <div @click="handlePressEnter">=</div>
@@ -40,6 +40,8 @@ interface CalculateFunction {
   (operand1: number, operand2: number): number;
 }
 
+type InputType = "." | "00" | number;
+
 const calcFuncs: Record<Operator, CalculateFunction> = {
   "+": (num1, num2) => num1 + num2,
   "-": (num1, num2) => num1 - num2,
@@ -54,72 +56,102 @@ interface CalculatorData {
   op: Operator | undefined;
   view: string;
   positiveMemory: string;
-  negativeMenory: string;
+  negativeMemory: string;
 }
 
 export default defineComponent({
   name: "CalculatorApp",
   data(): CalculatorData {
     return {
-      numDisplay: "0",
+      numDisplay: "",
       numCache: "0",
       isFromEnter: false,
       op: undefined,
       view: "0",
       positiveMemory: "",
-      negativeMenory: "",
+      negativeMemory: "",
     };
   },
   methods: {
     handleMC() {
       this.positiveMemory = "";
-      this.negativeMenory = "";
+      this.negativeMemory = "";
+      this.numDisplay = "";
     },
     handleMR() {
       this.view = String(
-        parseFloat(this.positiveMemory) + parseFloat(this.negativeMenory)
+        parseFloat(this.positiveMemory) + parseFloat(this.negativeMemory)
       );
-      console.log(this.positiveMemory, this.negativeMenory);
+      console.log(this.positiveMemory, this.negativeMemory);
     },
     handleMplus() {
-      this.positiveMemory = String(Math.abs(parseFloat(this.numDisplay)));
-      console.log(`positive memory is ${this.positiveMemory}`);
+      if (!this.isFromEnter) {
+        this.positiveMemory = String(Math.abs(parseFloat(this.numDisplay)));
+      } else {
+        this.positiveMemory = String(Math.abs(parseFloat(this.numCache)));
+      }
+      console.log(
+        `positive memory is ${this.positiveMemory} enter ${this.isFromEnter}`
+      );
+      this.numDisplay = "";
+      this.numCache = "";
+      this.view = this.numDisplay;
+      this.isFromEnter = false;
     },
     handleMminus() {
-      this.negativeMenory = String(-Math.abs(parseFloat(this.numDisplay)));
-      console.log(`negative memory is ${this.negativeMenory}`);
-    },
-    handlePressNum(num: string) {
-      if (this.isFromEnter === true) {
-        // 1+1=2 하고 AC버튼 없이 숫자를 눌렀을 경우
-        this.numCache = "";
-        if (num === "." && this.numCache.includes(".")) {
-          console.log("dot duplicated");
-        } else if (num !== "." && this.numCache === "0") {
-          this.numCache = `${num}`;
-        } else {
-          this.numCache = `${this.numCache}${num}`;
-        }
-        this.view = this.numCache;
-        this.isFromEnter = false;
+      if (!this.isFromEnter) {
+        this.negativeMemory = String(-Math.abs(parseFloat(this.numDisplay)));
       } else {
-        if (num === "." && this.numDisplay.includes(".")) {
-          console.log("dot duplicated");
-        } else if (num !== "." && this.numDisplay === "0") {
-          this.numDisplay = `${num}`;
-        } else {
-          this.numDisplay = `${this.numDisplay}${num}`;
-        }
-        console.log(
-          "op : ",
-          this.op,
-          "numDisplay : ",
-          this.numDisplay,
-          "numCache : ",
-          this.numCache
-        );
-        this.view = this.numDisplay;
+        this.negativeMemory = String(-Math.abs(parseFloat(this.numCache)));
       }
+      console.log(`negative memory is ${this.negativeMemory}`);
+      this.numDisplay = "";
+      this.numCache = "";
+      this.view = this.numDisplay;
+      this.isFromEnter = false;
+    },
+    handlePressNum(input: InputType) {
+      const handleUnexpectedInputs: Record<
+        InputType,
+        (prev: string) => string
+      > = {
+        ".": (prev) => {
+          if (prev.includes(".")) {
+            return prev;
+          } else {
+            return `${prev}.`;
+          }
+        },
+        "00": (prev) => {
+          if (prev == "0" || prev == "00") {
+            return "0";
+          } else {
+            return `${prev}00`;
+          }
+        },
+        "0": (prev) => {
+          if (prev == "0" || prev == "00") {
+            return "0";
+          } else {
+            return `${prev}0`;
+          }
+        },
+      };
+      if (typeof input === "number") {
+        this.numDisplay = `${this.numDisplay}${input}`;
+      } else {
+        console.log(handleUnexpectedInputs[input]("hi"));
+        this.numDisplay = handleUnexpectedInputs[input](this.numDisplay);
+      }
+      this.view = this.numDisplay;
+      console.log(
+        "op : ",
+        this.op,
+        "numDisplay : ",
+        this.numDisplay,
+        "numCache : ",
+        this.numCache
+      );
     },
     handlePressOp(op: Operator) {
       if (this.numDisplay) {
@@ -162,6 +194,14 @@ export default defineComponent({
       }
       this.isFromEnter = true;
       this.view = this.numCache;
+      console.log(
+        "op : ",
+        this.op,
+        "numDisplay : ",
+        this.numDisplay,
+        "numCache : ",
+        this.numCache
+      );
     },
     handlePressNegate() {
       if (this.isFromEnter) {

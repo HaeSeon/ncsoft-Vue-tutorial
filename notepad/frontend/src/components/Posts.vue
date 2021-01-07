@@ -32,6 +32,8 @@ export default defineComponent({
   data() {
     return {
       posts: [] as Post[],
+      scrolledToBottom: false,
+      limit: 0,
     };
   },
   methods: {
@@ -54,13 +56,23 @@ export default defineComponent({
         };
       });
     },
-
     addPost() {
       location.search = "";
+    },
+    scroll() {
+      window.onscroll = () => {
+        let scrollHeight = Math.max(document.documentElement.);
+        if (bottomOfWindow) {
+          this.scrolledToBottom = true;
+          // this.pageNum += 1;
+          console.log("jsjd");
+        }
+      };
     },
   },
   mounted() {
     this.readPosts();
+    this.scroll();
   },
 });
 </script>

@@ -34,21 +34,17 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-
 type Operator = "+" | "-" | "*" | "/";
 interface CalculateFunction {
   (operand1: number, operand2: number): number;
 }
-
 type InputType = "." | "00" | number;
-
 const calcFuncs: Record<Operator, CalculateFunction> = {
   "+": (num1, num2) => num1 + num2,
   "-": (num1, num2) => num1 - num2,
   "*": (num1, num2) => num1 * num2,
   "/": (num1, num2) => num1 / num2,
 };
-
 interface CalculatorData {
   numDisplay: string;
   numCache: string;
@@ -58,7 +54,6 @@ interface CalculatorData {
   positiveMemory: string;
   negativeMemory: string;
 }
-
 export default defineComponent({
   name: "CalculatorApp",
   data(): CalculatorData {
@@ -123,14 +118,14 @@ export default defineComponent({
           }
         },
         "00": (prev) => {
-          if (prev == "0" || prev == "00") {
+          if (prev === "0" || prev === "00") {
             return "0";
           } else {
             return `${prev}00`;
           }
         },
         "0": (prev) => {
-          if (prev == "0" || prev == "00") {
+          if (prev === "0" || prev === "00") {
             return "0";
           } else {
             return `${prev}0`;
@@ -159,7 +154,7 @@ export default defineComponent({
         if (!this.numCache) {
           // 이전 결과값이 없으면
           this.numCache = this.numDisplay;
-        } else if (this.isFromEnter === true) {
+        } else if (this.isFromEnter) {
           // 이전값이 넘어온 경로가 pressEnter이면
           console.log("pass");
         } else {
@@ -246,14 +241,12 @@ export default defineComponent({
   background-color: pink;
   padding: 10px;
 }
-
 .grid-container > div {
   background-color: rgba(255, 255, 255, 0.8);
   text-align: center;
   padding: 20px 0;
   font-size: 30px;
 }
-
 .result-viewer {
   grid-column-start: 1;
   grid-column-end: 6;

@@ -6,18 +6,7 @@ import { Post } from './model/Post';
 
 const url = "mongodb://localhost:27017/notepad_db"
 
-interface Schemas {
-  "user": MongoDB.Collection<User>
-  "post": MongoDB.Collection<Post>
-}
-
-interface DatabaseProps {
-  getCollection<K extends keyof Schemas>(collection: K): Schemas[K]
-}
-
-class Database implements DatabaseProps {
-  // lazy intialize??
-  private dbNote: MongoDB.Db | undefined
+class Database {
   private client: MongoDB.MongoClient | undefined;
 
   constructor() {
@@ -25,17 +14,9 @@ class Database implements DatabaseProps {
       assert.equal(null, err);
       console.log("Connected correctly to mongodb server");
       this.client = client
-      this.dbNote = client.db("notepad_db")
       // destuctor..??
       // client.close();
     });
-  }
-
-  getCollection<K extends keyof Schemas>(collectionName: K): Schemas[K] {
-    if (!this.client) {
-      throw 'db not initialized'
-    }
-    return this.client.db("notepad_db").collection(collectionName) as Schemas[K]
   }
 
   userCollection(): MongoDB.Collection<User> {
@@ -53,7 +34,3 @@ class Database implements DatabaseProps {
 }
 
 export const db = new Database()
-
-// testing code
-// export const userCollection = db.getCollection("user")
-// export const postCollection = db.getCollection("post")

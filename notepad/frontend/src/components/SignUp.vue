@@ -2,7 +2,12 @@
   <div class="signup">
     <h2>SignUp page</h2>
     <input v-model="user.id" class="input" placeholder="id" />
-    <input v-model="user.password" class="input" placeholder="password" />
+    <input
+      v-model="user.password"
+      class="input"
+      type="password"
+      placeholder="password"
+    />
     <button class="button" v-on:click="signUp">SignUp</button>
     <router-link to="/login">Login</router-link>
   </div>

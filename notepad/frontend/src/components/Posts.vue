@@ -37,7 +37,7 @@ export default defineComponent({
     };
   },
   methods: {
-    readPosts: async function () {
+    async readPosts() {
       this.isLoading = true;
       const url = `${serverUrl}/posts?start=${this.posts.length}`;
       const response = await fetch(url, {
